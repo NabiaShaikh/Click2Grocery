@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click2Grocery - Fresh Groceries Delivered to Your Door</title>
+    <meta name="description" content="Order fresh groceries online with Click2Grocery. Fast delivery, quality products, and easy shopping experience.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Swiper JS for carousels -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+    
+    <!-- Alpine.js for interactions -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style id="app-style">
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #FF9800;
+            --accent-color: #E91E63;
+            --light-green: #8BC34A;
+            --dark-green: #2E7D32;
+            --cream: #FFF8E1;
+            --light-gray: #F5F5F5;
+            --text-dark: #333333;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+        }
+        
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero-section {
+            background-image: url('https://cdn.pixabay.com/photo/2016/04/21/11/32/vegetables-1343304_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .hero-overlay {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        
+        .category-card {
+            transition: transform 0.3s ease;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .organic-badge {
+            background-color: var(--light-green);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .discount-badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            background: white;
+            z-index: 50;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .cart-overlay.active {
+            transform: translateX(0);
+        }
+        
+        .drawer-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+        
+        .drawer-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .auth-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 60;
+            display: none;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .auth-modal.active {
+            display: block;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+        }
+        
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #F57C00;
+        }
+        
+        .btn-outline {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .swiper-button-next, .swiper-button-prev {
+            color: var(--primary-color) !important;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 0px;
+        }
+        
+        .footer-link {
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Mobile menu */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80%;
+            height: 100vh;
+            background: white;
+            z-index: 50;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body x-data="{
+    cartOpen: false,
+    mobileMenuOpen: false,
+    authModalOpen: false,
+    activeAuthTab: 'login',
+    showSearch: false,
+    userLoggedIn: false
+}">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <a href="javascript:void(0)" class="flex items-center">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-shopping-basket text-white text-xl"></i>
+                        </div>
+                        <span class="ml-2 text-2xl font-bold text-green-600 logo-text">Click2Grocery</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="javascript:void(0)" class="font-medium hover:text-green-500 transition">Home</a>
+                    <a href="javascript:void(0)" class="font-medium hover:text-green-500 transition">Shop</a>
+                    <a href="javascript:void(0)" class="font-medium hover:text-green-500 transition">Categories</a>
+                    <a href="javascript:void(0)" class="font-medium hover:text-green-500 transition">Deals</a>
+                    <a href="javascript:void(0)" class="font-medium hover:text-green-500 transition">Contact</a>
+                </nav>
+                
+                <!-- Search, User and Cart -->
+                <div class="flex items-center space-x-6">
+                    <button @click="showSearch = !showSearch" class="text-gray-700 hover:text-green-500">
+                        <i class="fas fa-search text-xl"></i>
+                    </button>
+                    
+                    <button @click="authModalOpen = true" x-show="!userLoggedIn" class="text-gray-700 hover:text-green-500">
+                        <i class="fas fa-user text-xl"></i>
+                    </button>
+                    
+                    <div class="relative" x-show="userLoggedIn">
+                        <button class="flex items-center space-x-1 text-gray-700 hover:text-green-500">
+                            <i class="fas fa-user-circle text-xl"></i>
+                            <span class="hidden md:inline">My Account</span>
+                        </button>
+                    </div>
+                    
+                    <button @click="cartOpen = true" class="relative text-gray-700 hover:text-green-500">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute -top-2 -right-2 bg-green-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
+                    </button>
+                    
+                    <button @click="mobileMenuOpen = true" class="md:hidden text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Bar (Expandable) -->
+        <div x-show="showSearch" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="bg-gray-100 py-4">
+            <div class="container mx-auto px-4">
+                <div class="relative">
+                    <input type="text" placeholder="Search for products..." class="w-full py-2 pl-10 pr-4 border border-gray-300 rounded-lg focus:outline-none">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <button @click="showSearch = false" class="absolute right-3 top-2 text-gray-500">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu Sidebar -->
+    <div class="mobile-menu shadow-lg" :class="{'active': mobileMenuOpen}">
+        <div class="p-4 border-b">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shopping-basket text-white text-sm"></i>
+                    </div>
+                    <span class="text-xl font-bold text-green-600 logo-text">Click2Grocery</span>
+                </div>
+                <button @click="mobileMenuOpen = false" class="text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <div class="py-4">
+            <nav class="flex flex-col">
+                <a href="javascript:void(0)" class="px-4 py-3 hover:bg-gray-100 font-medium">Home</a>
+                <a href="javascript:void(0)" class="px-4 py-3 hover:bg-gray-100 font-medium">Shop</a>
+                <a href="javascript:void(0)" class="px-4 py-3 hover:bg-gray-100 font-medium">Categories</a>
+                <a href="javascript:void(0)" class="px-4 py-3 hover:bg-gray-100 font-medium">Deals</a>
+                <a href="javascript:void(0)" class="px-4 py-3 hover:bg-gray-100 font-medium">Contact</a>
+            </nav>
+            <div class="mt-6 px-4">
+                <button @click="authModalOpen = true; mobileMenuOpen = false" x-show="!userLoggedIn" class="btn-primary w-full mb-3">
+                    Sign In
+                </button>
+                <template x-if="userLoggedIn">
+                    <div class="space-y-2">
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-green-600 hover:bg-green-50 rounded-md">
+                            <i class="fas fa-user-circle mr-2"></i> My Profile
+                        </a>
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-green-600 hover:bg-green-50 rounded-md">
+                            <i class="fas fa-box mr-2"></i> My Orders
+                        </a>
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-green-600 hover:bg-green-50 rounded-md">
+                            <i class="fas fa-heart mr-2"></i> Wishlist
+                        </a>
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-red-600 hover:bg-red-50 rounded-md">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    <div class="drawer-backdrop" :class="{'active': mobileMenuOpen}" @click="mobileMenuOpen = false"></div>
+    
+    <!-- Hero Section -->
+    <section class="hero-section relative">
+        <div class="hero-overlay absolute inset-0"></div>
+        <div class="container mx-auto px-4 py-20 md:py-32 relative z-10">
+            <div class="max-w-lg text-white">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Fresh Groceries Delivered To Your Door</h1>
+                <p class="text-lg mb-8">Shop from our wide selection of fresh produce, pantry essentials, and household items.</p>
+                <div class="flex space-x-4">
+                    <a href="javascript:void(0)" class="btn-primary py-3 px-6">Shop Now</a>
+                    <a href="javascript:void(0)" class="btn-outline border-white text-white hover:bg-white hover:text-green-600 py-3 px-6">View Deals</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Categories Section -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold">Shop by Category</h2>
+                <a href="javascript:void(0)" class="text-green-600 hover:text-green-700 font-medium">View All <i class="fas fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="category-card bg-white rounded-lg shadow-sm overflow-hidden text-center">
+                    <a href="javascript:void(0)" class="block p-4">
+                        <img src="https://cdn.pixabay.com/photo/2016/03/05/19/02/vegetables-1238252_1280.jpg" alt="Fresh Produce" class="w-20 h-20 object-cover mx-auto rounded-full mb-4">
+                        <h3 class="font-medium">Fresh Produce</h3>
+                    </a>
+                </div>
+                <div class="category-card bg-white rounded-lg shadow-sm overflow-hidden text-center">
+                    <a href="javascript:void(0)" class="block p-4">
+                        <img src="https://cdn.pixabay.com/photo/2016/12/06/18/27/milk-1887234_1280.jpg" alt="Dairy & Eggs" class="w-20 h-20 object-cover mx-auto rounded-full mb-4">
+                        <h3 class="font-medium">Dairy & Eggs</h3>
+                    </a>
+                </div>
+                <div class="category-card bg-white rounded-lg shadow-sm overflow-hidden text-center">
+                    <a href="javascript:void(0)" class="block p-4">
+                        <img src="https://cdn.pixabay.com/photo/2017/07/16/12/07/beef-2509104_1280.jpg" alt="Meat & Seafood" class="w-20 h-20 object-cover mx-auto rounded-full mb-4">
+                        <h3 class="font-medium">Meat & Seafood</h3>
+                    </a>
+                </div>
+                <div class="category-card bg-white rounded-lg shadow-sm overflow-hidden text-center">
+                    <a href="javascript:void(0)" class="block p-4">
+                        <img src="https://cdn.pixabay.com/photo/2016/05/24/13/29/olive-oil-1412361_1280.jpg" alt="Pantry" class="w-20 h-20 object-cover mx-auto rounded-full mb-4">
+                        <h3 class="font-medium">Pantry</h3>
+                    </a>
+                </div>
+                <div class="category-card bg-white rounded-lg shadow-sm overflow-hidden text-center">
+                    <a href="javascript:void(0)" class="block p-4">
+                        <img src="https://media.istockphoto.com/id/533725350/photo/display-of-ordinary-bakery-with-bread-and-buns.jpg?b=1&s=612x612&w=0&k=20&c=ws0ke36nPsaxagcsGrk2q-cSVcBzERtimORWhBB0-Ag=" alt="Bakery" class="w-20 h-20 object-cover mx-auto rounded-full mb-4">
+                        <h3 class="font-medium">Bakery</h3>
+                    </a>
+                </div>
+                <div class="category-card bg-white rounded-lg shadow-sm overflow-hidden text-center">
+                    <a href="javascript:void(0)" class="block p-4">
+                        <img src="https://images.pexels.com/photos/699422/pexels-photo-699422.jpeg" alt="Organic" class="w-20 h-20 object-cover mx-auto rounded-full mb-4">
+                        <h3 class="font-medium">Organic</h3>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Deals Banner -->
+    <section class="py-10">
+        <div class="container mx-auto px-4">
+            <div class="bg-gradient-to-r from-green-600 to-green-400 rounded-xl overflow-hidden">
+                <div class="grid md:grid-cols-2 items-center">
+                    <div class="p-8 md:p-12">
+                        <span class="inline-block bg-yellow-400 text-yellow-800 rounded-full px-4 py-1 text-sm font-semibold mb-4">Limited Time Offer</span>
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">20% Off Fresh Organic Produce</h2>
+                        <p class="text-green-50 mb-6">Stock up on the freshest seasonal fruits and vegetables. Use code FRESH20 at checkout.</p>
+                        <a href="javascript:void(0)" class="inline-block bg-white text-green-600 font-medium py-3 px-6 rounded-lg hover:bg-green-50 transition">Shop Now</a>
+                    </div>
+                    <div class="hidden md:block">
+                        <img src="https://images.pexels.com/photos/219794/pexels-photo-219794.jpeg " alt="Fresh Produce Deal" class="w-full h-80 object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Featured Products -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold">Featured Products</h2>
+                <div class="flex space-x-2">
+                    <button class="swiper-button-prev-featured w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-green-100">
+                        <i class="fas fa-chevron-left text-gray-700"></i>
+                    </button>
+                    <button class="swiper-button-next-featured w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-green-100">
+                        <i class="fas fa-chevron-right text-gray-700"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Swiper container -->
+            <div class="swiper-container featured-products-swiper">
+                <div class="swiper-wrapper">
+                    <!-- Product 1 -->
+                    <div class="swiper-slide">
+                        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden relative">
+                            <span class="discount-badge">-15%</span>
+                            <a href="javascript:void(0)">
+                                <img src="https://images.pexels.com/photos/32621612/pexels-photo-32621612.jpeg" alt="Organic Avocado" class="w-full h-48 object-cover">
+                            </a>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="organic-badge mb-2">Organic</span>
+                                        <h3 class="font-medium text-lg">Organic Avocado</h3>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-green-500">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-3">1 each</p>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-lg font-bold text-green-600">$1.99</span>
+                                        <span class="text-sm text-gray-500 line-through ml-2">$2.49</span>
+                                    </div>
+                                    <button class="btn-primary rounded-full w-10 h-10 flex items-center justify-center">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 2 -->
+                    <div class="swiper-slide">
+                        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden relative">
+                            <a href="javascript:void(0)">
+                                <img src="https://cdn.pixabay.com/photo/2016/04/15/08/04/strawberry-1330459_1280.jpg" alt="Fresh Strawberries" class="w-full h-48 object-cover">
+                            </a>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="organic-badge mb-2">Organic</span>
+                                        <h3 class="font-medium text-lg">Fresh Strawberries</h3>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-green-500">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-3">1 lb package</p>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-lg font-bold text-green-600">$3.99</span>
+                                    </div>
+                                    <button class="btn-primary rounded-full w-10 h-10 flex items-center justify-center">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 3 -->
+                    <div class="swiper-slide">
+                        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden relative">
+                            <span class="discount-badge">-10%</span>
+                            <a href="javascript:void(0)">
+                                <img src="https://images.pexels.com/photos/10202995/pexels-photo-10202995.jpeg" alt="Artisan Sourdough Bread" class="w-full h-48 object-cover">
+                            </a>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-medium text-lg">Artisan Sourdough Bread</h3>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-green-500">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-3">1 loaf (16 oz)</p>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-lg font-bold text-green-600">$4.49</span>
+                                        <span class="text-sm text-gray-500 line-through ml-2">$4.99</span>
+                                    </div>
+                                    <button class="btn-primary rounded-full w-10 h-10 flex items-center justify-center">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 4 -->
+                    <div class="swiper-slide">
+                        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden relative">
+                            <a href="javascript:void(0)">
+                                <img src="https://images.pexels.com/photos/8805421/pexels-photo-8805421.jpeg" alt="Organic Whole Milk" class="w-full h-48 object-cover">
+                            </a>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <span class="organic-badge mb-2">Organic</span>
+                                        <h3 class="font-medium text-lg">Organic Whole Milk</h3>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-green-500">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-3">1/2 gallon</p>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-lg font-bold text-green-600">$3.79</span>
+                                    </div>
+                                    <button class="btn-primary rounded-full w-10 h-10 flex items-center justify-center">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Product 5 -->
+                    <div class="swiper-slide">
+                        <div class="product-card bg-white rounded-lg shadow-sm overflow-hidden relative">
+                            <a href="javascript:void(0)">
+                                <img src="https://images.pexels.com/photos/5769384/pexels-photo-5769384.jpeg" alt="Free-Range Chicken Breast" class="w-full h-48 object-cover">
+                            </a>
+                            <div class="p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h3 class="font-medium text-lg">Free-Range Chicken Breast</h3>
+                                    </div>
+                                    <button class="text-gray-400 hover:text-green-500">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </div>
+                                <p class="text-gray-500 text-sm mb-3">1 lb package</p>
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <span class="text-lg font-bold text-green-600">$6.99</span>
+                                    </div>
+                                    <button class="btn-primary rounded-full w-10 h-10 flex items-center justify-center">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Benefits Section -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">Why Choose Click2Grocery?</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">We're committed to providing the best online grocery shopping experience with quality products, fast delivery, and exceptional customer service.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-leaf text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Fresh & Organic</h3>
+                    <p class="text-gray-600">We source the freshest produce directly from local farms and trusted suppliers.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-truck text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Fast Delivery</h3>
+                    <p class="text-gray-600">Same-day delivery available. Your groceries will arrive fresh at your doorstep.</p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tags text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Best Prices</h3>
+                    <p class="text-gray-600">Competitive prices and regular deals to help you save on your grocery bills.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">What Our Customers Say</h2>
+                <p class="text-gray-600 max-w-3xl mx-auto">Don't just take our word for it. Here's what our customers have to say about their Click2Grocery experience.</p>
+            </div>
+            
+            <div class="swiper-container testimonials-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-6">"Click2Grocery has changed the way I shop. The produce is always fresh, and delivery is consistently on time. I love the organic selection!"</p>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gray-300 mr-4"> 
+                                    <img src="https://images.pexels.com/photos/27738921/pexels-photo-27738921.jpeg" alt="" style="border-radius: 50%;">
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Sarah Johnson</h4>
+                                    <p class="text-sm text-gray-500">Loyal Customer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide">
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-6">"The quality of meat and seafood is exceptional. Everything is always packaged well and arrives in perfect condition. Great customer service too!"</p>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gray-300 mr-4">
+                                     <img src="https://images.pexels.com/photos/7341985/pexels-photo-7341985.jpeg" alt="" style="border-radius: 50%;">
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Michael Rodriguez</h4>
+                                    <p class="text-sm text-gray-500">Happy Shopper</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="swiper-slide">
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <div class="flex items-center mb-4">
+                                <div class="text-yellow-400">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 mb-6">"As a busy mom, Click2Grocery saves me so much time. The app is easy to use, and I love the weekly specials. Their organic baby food selection is amazing!"</p>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-gray-300 mr-4"> 
+                                     <img src="https://images.pexels.com/photos/5550927/pexels-photo-5550927.jpeg" alt="" style="border-radius: 50%;">
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold">Emily Chen</h4>
+                                    <p class="text-sm text-gray-500">Regular Customer</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination testimonials-pagination mt-6"></div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Download App Section -->
+    <section class="py-12 bg-green-600 text-white">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Download Our Mobile App</h2>
+                    <p class="text-green-50 mb-6">Get exclusive app-only deals, track your deliveries in real-time, and enjoy a seamless shopping experience on the go.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="javascript:void(0)" class="bg-black text-white px-6 py-3 rounded-lg flex items-center hover:bg-gray-900 transition">
+                            <i class="fab fa-apple text-2xl mr-3"></i>
+                            <div>
+                                <div class="text-xs">Download on the</div>
+                                <div class="text-lg font-semibold">App Store</div>
+                            </div>
+                        </a>
+                        <a href="javascript:void(0)" class="bg-black text-white px-6 py-3 rounded-lg flex items-center hover:bg-gray-900 transition">
+                            <i class="fab fa-google-play text-2xl mr-3"></i>
+                            <div>
+                                <div class="text-xs">Get it on</div>
+                                <div class="text-lg font-semibold">Google Play</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="hidden md:block text-center">
+                    <img src="https://images.pexels.com/photos/1542252/pexels-photo-1542252.jpeg" alt="Click2Grocery Mobile App" class="max-h-96 mx-auto rounded-lg shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Subscribe Section -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4">Subscribe to Our Newsletter</h2>
+                <p class="text-gray-600 mb-6">Sign up to receive weekly deals, new product announcements, and seasonal recipes.</p>
+                <form class="flex flex-col md:flex-row gap-2 max-w-lg mx-auto">
+                    <input type="email" placeholder="Your email address" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+                    <button type="submit" class="btn-primary py-3 px-6 md:px-8">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-200 pt-12 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-shopping-basket text-white text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold text-white logo-text">Click2Grocery</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Your one-stop online grocery store for fresh, quality products delivered to your doorstep.</p>
+                    <div class="flex space-x-4">
+                        <a href="javascript:void(0)" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="javascript:void(0)" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://www.instagram.com/_shk.01_/" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="javascript:void(0)" class="text-gray-400 hover:text-white transition">
+                            <i class="fab fa-pinterest"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">About Us</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Shop All</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Recipes</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Weekly Deals</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Gift Cards</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Customer Service</h3>
+                    <ul class="space-y-2">
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Help Center</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Delivery Information</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Returns & Refunds</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">Contact Us</a></li>
+                        <li><a href="javascript:void(0)" class="text-gray-400 hover:text-white footer-link">FAQs</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-green-500"></i>
+                            <span>1234 Market Street, Suite 900<br>San Francisco, CA 94103</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt mr-3 text-green-500"></i>
+                            <span>(123) 456-7890</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3 text-green-500"></i>
+                            <span>support@click2grocery.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-clock mr-3 text-green-500"></i>
+                            <span>Mon-Sat: 8:00AM - 10:00PM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="border-gray-700 my-8">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2025 Click2Grocery. All rights reserved.</p>
+                <div class="flex flex-wrap gap-4 mt-4 md:mt-0">
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white text-sm footer-link">Privacy Policy</a>
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white text-sm footer-link">Terms of Service</a>
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white text-sm footer-link">Accessibility</a>
+                    <a href="javascript:void(0)" class="text-gray-400 hover:text-white text-sm footer-link">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Shopping Cart Sidebar -->
+    <div class="cart-overlay" :class="{'active': cartOpen}">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="text-xl font-semibold">Your Cart (3)</h3>
+            <button @click="cartOpen = false" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="p-4 flex-1 overflow-y-auto">
+            <div class="space-y-4">
+                <!-- Cart Item -->
+                <div class="flex border-b pb-4">
+                    <img src="https://images.pexels.com/photos/32621612/pexels-photo-32621612.jpeg" alt="Organic Avocado" class="w-20 h-20 object-cover rounded">
+                    <div class="ml-4 flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="font-medium">Organic Avocado</h4>
+                            <button class="text-gray-400 hover:text-red-500">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-500 text-sm">1 each</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="flex items-center border rounded">
+                                <button class="px-2 py-1 text-gray-600 hover:text-gray-800">-</button>
+                                <span class="px-2 py-1 border-x">1</span>
+                                <button class="px-2 py-1 text-gray-600 hover:text-gray-800">+</button>
+                            </div>
+                            <span class="font-semibold">$1.99</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cart Item -->
+                <div class="flex border-b pb-4">
+                    <img src="https://cdn.pixabay.com/photo/2016/04/15/08/04/strawberry-1330459_1280.jpg" alt="Fresh Strawberries" class="w-20 h-20 object-cover rounded">
+                    <div class="ml-4 flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="font-medium">Fresh Strawberries</h4>
+                            <button class="text-gray-400 hover:text-red-500">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-500 text-sm">1 lb package</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="flex items-center border rounded">
+                                <button class="px-2 py-1 text-gray-600 hover:text-gray-800">-</button>
+                                <span class="px-2 py-1 border-x">2</span>
+                                <button class="px-2 py-1 text-gray-600 hover:text-gray-800">+</button>
+                            </div>
+                            <span class="font-semibold">$7.98</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cart Item -->
+                <div class="flex pb-4">
+                    <img src="https://images.pexels.com/photos/10202995/pexels-photo-10202995.jpeg" alt="Artisan Sourdough Bread" class="w-20 h-20 object-cover rounded">
+                    <div class="ml-4 flex-1">
+                        <div class="flex justify-between">
+                            <h4 class="font-medium">Artisan Sourdough Bread</h4>
+                            <button class="text-gray-400 hover:text-red-500">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                        <p class="text-gray-500 text-sm">1 loaf (16 oz)</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="flex items-center border rounded">
+                                <button class="px-2 py-1 text-gray-600 hover:text-gray-800">-</button>
+                                <span class="px-2 py-1 border-x">1</span>
+                                <button class="px-2 py-1 text-gray-600 hover:text-gray-800">+</button>
+                            </div>
+                            <span class="font-semibold">$4.49</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t">
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Subtotal</span>
+                    <span class="font-semibold">$14.46</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-600">Delivery</span>
+                    <span class="font-semibold">$3.99</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                    <span>Total</span>
+                    <span>$18.45</span>
+                </div>
+                
+                <button class="btn-primary w-full py-3 mt-4">Proceed to Checkout</button>
+                <button @click="cartOpen = false" class="btn-outline w-full py-3">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+    <div class="drawer-backdrop" :class="{'active': cartOpen}" @click="cartOpen = false"></div>
+    
+    <!-- Auth Modal -->
+    <div class="auth-modal" :class="{'active': authModalOpen}">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold">Welcome</h3>
+            <button @click="authModalOpen = false" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="flex border-b mb-6">
+            <button @click="activeAuthTab = 'login'" class="pb-4 px-4 border-b-2" :class="activeAuthTab === 'login' ? 'text-green-600 border-green-600 font-medium' : 'border-transparent'">Login</button>
+            <button @click="activeAuthTab = 'signup'" class="pb-4 px-4 border-b-2" :class="activeAuthTab === 'signup' ? 'text-green-600 border-green-600 font-medium' : 'border-transparent'">Sign Up</button>
+        </div>
+        
+        <!-- Login Form -->
+        <div x-show="activeAuthTab === 'login'" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" placeholder="Your email" class="w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" placeholder="Your password" class="w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" class="h-4 w-4 text-green-600">
+                    <label for="remember" class="ml-2 text-sm text-gray-600">Remember me</label>
+                </div>
+                <a href="javascript:void(0)" class="text-sm text-green-600 hover:text-green-800">Forgot password?</a>
+            </div>
+            <button class="btn-primary w-full py-3">Login</button>
+            
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <button class="flex items-center justify-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fab fa-google text-red-500 mr-2"></i> Google
+                </button>
+                <button class="flex items-center justify-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fab fa-facebook-f text-blue-600 mr-2"></i> Facebook
+                </button>
+            </div>
+        </div>
+        
+        <!-- Signup Form -->
+        <div x-show="activeAuthTab === 'signup'" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input type="text" placeholder="Your name" class="w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" placeholder="Your email" class="w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" placeholder="Create password" class="w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <input type="password" placeholder="Confirm password" class="w-full p-3 border border-gray-300 rounded-lg">
+            </div>
+            <div class="flex items-center">
+                <input type="checkbox" id="terms" class="h-4 w-4 text-green-600">
+                <label for="terms" class="ml-2 text-sm text-gray-600">I agree to the <a href="javascript:void(0)" class="text-green-600 hover:underline">Terms of Service</a> and <a href="javascript:void(0)" class="text-green-600 hover:underline">Privacy Policy</a></label>
+            </div>
+            <button class="btn-primary w-full py-3">Create Account</button>
+            
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <button class="flex items-center justify-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fab fa-google text-red-500 mr-2"></i> Google
+                </button>
+                <button class="flex items-center justify-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fab fa-facebook-f text-blue-600 mr-2"></i> Facebook
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop" :class="{'active': authModalOpen}" @click="authModalOpen = false"></div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+    
+    <script id="app-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Featured Products Swiper
+            const featuredProductsSwiper = new Swiper('.featured-products-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                navigation: {
+                    nextEl: '.swiper-button-next-featured',
+                    prevEl: '.swiper-button-prev-featured',
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 2,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                    },
+                    1024: {
+                        slidesPerView: 4,
+                    },
+                }
+            });
+            
+            // Initialize Testimonials Swiper
+            const testimonialsSwiper = new Swiper('.testimonials-swiper', {
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: {
+                    el: '.testimonials-pagination',
+                    clickable: true,
+                },
+                breakpoints: {
+                    768: {
+                        slidesPerView: 2,
+                    },
+                    1024: {
+                        slidesPerView: 3,
+                    },
+                }
+            });
+        });
+        
+        // Simulate fake API responses
+        function fetchData(endpoint) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({ message: "This is a prototype, continue building to see the full version." });
+                }, 1000);
+            });
+        }
+    </script>
+</body>
+</html>
